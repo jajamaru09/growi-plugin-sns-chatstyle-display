@@ -3,39 +3,40 @@
 ## 実装アプローチ
 
 ### 1. アイコンサイズ変更（CSS）
-- `chat-style.css` のアバター・アイコンサイズを `60px` → `100px` に変更
-- レスポンシブ（600px以下）は `48px` → `72px` に変更
+- 前回コミットで対応済み（100px / レスポンシブ72px）
 
-### 2. SpeakerMap未取得時の挙動改善（plugin.ts, node-transformer.ts）
+### 2. fetchSpeakerMapをawaitしてからプラグイン登録（client-entry.tsx）
 
-**現状の問題：** `plugin.ts` で SpeakerMap が null の場合、`transformError()` でコンテナ全体をエラーHTMLに置換し、チャット内容が一切表示されない。
+**現状の問題：** `fetchSpeakerMap()` を fire-and-forget し、直後にプラグイン登録するため、初回レンダリング時にSpeakerMapが未取得。
 
 **改善方針：**
-- SpeakerMap未取得時もコンテナ変換 (`transformChatStyleBlock`) は実行する
-- 各話者バブルは `resolveSpeaker` が null を返すので、その場合はアイコンなし・話者名を directive 名で代替表示する
-- `node-transformer.ts` に `transformSpeakerBubbleFallback()` を追加し、SpeakerDefinition なしでもバブル表示できるようにする
+- `activate()` 内で `await fetchSpeakerMap()` してからremarkプラグインを登録する
+- これにより初回レンダリング時にはSpeakerMapが確実に取得済み
+- `activate()` を async に変更
 
-### 3. リロードボタン（node-transformer.ts, client-entry.tsx, CSS）
+### 3. リロードボタンの修正（node-transformer.ts, client-entry.tsx, CSS）
 
-**方針：** AST変換時にリロードボタンのHTMLをコンテナ上部に挿入する。ボタン押下で `fetchSpeakerMap()` を実行後、ページをリロードして再レンダリングする。
+**現状の問題：**
+- インライン `onclick` はReactの `dangerouslySetInnerHTML` 経由で描画されるため動作しない
+- SVGがReactのサニタイズで正しく描画されない可能性
 
-- `node-transformer.ts` の `transformChatStyleBlock()` にリロードボタンHTML挿入を追加
-- `client-entry.tsx` にクリックイベントハンドラをグローバル関数として登録
-- CSS にリロードボタンのスタイルを追加
-- リロードアイコンは SVG（Unicode や外部ライブラリに依存しない）
+**改善方針：**
+- SVGの代わりにUnicode文字 `↻` を使用（サニタイズに影響されない）
+- ボタンに `data-chat-style-reload` 属性を付与
+- `client-entry.tsx` で `document.addEventListener('click', ...)` によるイベント委譲でクリックを捕捉
+- クリック時は `fetchSpeakerMap()` → `location.reload()` で再レンダリング
 
 ### 変更するコンポーネント
 
 | ファイル | 変更内容 |
 |---|---|
-| `src/styles/chat-style.css` | アイコンサイズ100px化、リロードボタンスタイル追加 |
-| `src/plugin.ts` | SpeakerMap未取得時のエラーブロックを削除、フォールバック処理追加 |
-| `src/node-transformer.ts` | `transformSpeakerBubbleFallback()` 追加、リロードボタンHTML追加 |
-| `client-entry.tsx` | リロード用グローバル関数の登録 |
+| `src/node-transformer.ts` | リロードボタンのHTML修正（SVG→Unicode、onclick→data属性） |
+| `client-entry.tsx` | activate()をasync化、fetchSpeakerMap()をawait、イベント委譲でリロード処理 |
+| `src/styles/chat-style.css` | リロードボタンのフォントサイズ調整 |
 
 ### 影響範囲の分析
-- SpeakerMap取得済みの場合の表示には影響なし（アイコンサイズ以外）
-- リロードボタンは常に表示されるが、控えめなデザインにする
+- SpeakerMap取得済みの場合の表示には影響なし
+- activate()がasyncになるが、Growiのプラグインシステムはactivateの戻り値を使わないため問題なし
 
 ## 参考 URL
 - なし（既存実装の改修のみ）

@@ -13,7 +13,7 @@ declare const growiFacade: {
   };
 } | null;
 
-const activate = (): void => {
+const activate = async (): Promise<void> => {
   if (growiFacade == null || growiFacade.markdownRenderer == null) {
     return;
   }
@@ -23,15 +23,18 @@ const activate = (): void => {
   style.textContent = CSS_CONTENT;
   document.head.appendChild(style);
 
-  // 話者定義の非同期取得（ページ読み込みをブロックしない）
-  fetchSpeakerMap();
+  // 話者定義を取得してからプラグイン登録（初回レンダリング時にSpeakerMapを確実に利用可能にする）
+  await fetchSpeakerMap();
 
-  // リロードボタン用グローバル関数を登録
-  (window as any).__chatStyleReload = () => {
-    fetchSpeakerMap().then(() => {
-      window.location.reload();
-    });
-  };
+  // リロードボタンのイベント委譲（data-chat-style-reload属性を持つボタンのクリックを捕捉）
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('[data-chat-style-reload]')) {
+      fetchSpeakerMap().then(() => {
+        window.location.reload();
+      });
+    }
+  });
 
   // remarkプラグイン登録
   const { optionsGenerators } = growiFacade.markdownRenderer;

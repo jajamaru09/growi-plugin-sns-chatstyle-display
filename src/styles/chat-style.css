@@ -179,13 +179,11 @@
   background: var(--bs-body-bg, #fff);
   color: var(--bs-secondary-color, #6c757d);
   cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
   transition: color 0.15s, background 0.15s;
 }
 .chat-style-reload-btn:hover {
   color: var(--bs-body-color, #212529);
   background: var(--bs-secondary-bg, #e9ecef);
-}
-.chat-style-reload-btn svg {
-  width: 16px;
-  height: 16px;
 }
