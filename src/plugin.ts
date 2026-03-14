@@ -13,12 +13,20 @@ interface DirectiveNode extends Node {
 
 export const plugin: Plugin = function() {
   return (tree: Node) => {
+    console.log('[chat-style] Plugin running, walking AST...');
+    let directiveCount = 0;
+
     visit(tree, 'containerDirective', (node: Node) => {
       const n = node as DirectiveNode;
+      directiveCount++;
+      console.log('[chat-style] Found containerDirective:', n.name, 'type:', n.type);
       if (n.name !== 'chat-style') return;
+
+      console.log('[chat-style] Found ::::chat-style block, children:', n.children.length);
 
       // SpeakerMapが未取得の場合
       const map = getSpeakerMap();
+      console.log('[chat-style] SpeakerMap:', map ? `${map.size} entries` : 'null');
       if (!map) {
         transformError(
           n,
@@ -35,8 +43,10 @@ export const plugin: Plugin = function() {
         if (child.type !== 'containerDirective') continue;
 
         const def = resolveSpeaker(child.name);
+        console.log('[chat-style] Resolving speaker:', child.name, '→', def);
         if (def) {
           transformSpeakerBubble(child, def);
+          console.log('[chat-style] Transformed bubble:', child.name, 'position:', def.position);
         }
         else {
           transformError(
@@ -46,5 +56,7 @@ export const plugin: Plugin = function() {
         }
       }
     });
+
+    console.log('[chat-style] AST walk complete, found', directiveCount, 'containerDirectives');
   };
 };
