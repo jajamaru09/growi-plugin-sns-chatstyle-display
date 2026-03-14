@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:dev.to)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:qiita.com)",
+      "Bash(start:*)",
+      "Bash(gh search:*)",
+      "WebFetch(domain:docs.growi.org)"
+    ]
+  }
+}

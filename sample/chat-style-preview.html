@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ja" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Style Preview - Growi Plugin</title>
+  <style>
+    /* ===== テーマ切り替えボタン（プレビュー用） ===== */
+    .theme-toggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 100;
+      padding: 8px 16px;
+      border: 1px solid #888;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85em;
+      background: var(--bs-body-bg, #fff);
+      color: var(--bs-body-color, #333);
+    }
+
+    /* ===== Bootstrap CSS変数のフォールバック定義 ===== */
+    /* Growi上ではBootstrapが提供するため不要。プレビュー用に定義 */
+    :root, [data-bs-theme="light"] {
+      --bs-body-bg: #fff;
+      --bs-body-color: #212529;
+      --bs-secondary-bg: #e9ecef;
+      --bs-tertiary-bg: #f8f9fa;
+      --bs-secondary-color: rgba(33, 37, 41, 0.75);
+      --bs-border-color: #dee2e6;
+      --bs-emphasis-color: #000;
+      --bs-danger-text-emphasis: #842029;
+      --bs-danger-bg-subtle: #f8d7da;
+      --bs-danger-border-subtle: #f5c2c7;
+    }
+    [data-bs-theme="dark"] {
+      --bs-body-bg: #212529;
+      --bs-body-color: #dee2e6;
+      --bs-secondary-bg: #343a40;
+      --bs-tertiary-bg: #2b3035;
+      --bs-secondary-color: rgba(222, 226, 230, 0.75);
+      --bs-border-color: #495057;
+      --bs-emphasis-color: #fff;
+      --bs-danger-text-emphasis: #ea868f;
+      --bs-danger-bg-subtle: #2c0b0e;
+      --bs-danger-border-subtle: #842029;
+    }
+
+    /* ===== ページ全体（Growi風） ===== */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 24px;
+      background: var(--bs-body-bg);
+      color: var(--bs-body-color);
+      line-height: 1.7;
+      transition: background 0.2s, color 0.2s;
+    }
+    h1 { border-bottom: 1px solid var(--bs-border-color); padding-bottom: 8px; }
+    h2 { margin-top: 32px; }
+    p { margin: 12px 0; }
+    code {
+      background: var(--bs-secondary-bg);
+      color: var(--bs-emphasis-color);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    hr { border-color: var(--bs-border-color); }
+
+    /* ==========================================================
+       chat-style プラグイン CSS
+       Bootstrap CSS変数を利用してlight/darkに自動対応
+       ========================================================== */
+
+    /* ----- プラグイン独自CSS変数 ----- */
+    :root, [data-bs-theme="light"] {
+      --chat-style-container-bg: var(--bs-tertiary-bg);
+      --chat-style-left-bg: var(--bs-secondary-bg);
+      --chat-style-left-color: var(--bs-body-color);
+      --chat-style-right-bg: #8de88b;
+      --chat-style-right-color: #1a3a1a;
+      --chat-style-speaker-color: var(--bs-secondary-color);
+      --chat-style-icon-bg: var(--bs-secondary-bg);
+      --chat-style-error-bg: var(--bs-danger-bg-subtle);
+      --chat-style-error-border: var(--bs-danger-border-subtle);
+      --chat-style-error-color: var(--bs-danger-text-emphasis);
+    }
+    [data-bs-theme="dark"] {
+      --chat-style-container-bg: var(--bs-tertiary-bg);
+      --chat-style-left-bg: var(--bs-secondary-bg);
+      --chat-style-left-color: var(--bs-body-color);
+      --chat-style-right-bg: #2d6a2e;
+      --chat-style-right-color: #d4f5d4;
+      --chat-style-speaker-color: var(--bs-secondary-color);
+      --chat-style-icon-bg: var(--bs-secondary-bg);
+      --chat-style-error-bg: var(--bs-danger-bg-subtle);
+      --chat-style-error-border: var(--bs-danger-border-subtle);
+      --chat-style-error-color: var(--bs-danger-text-emphasis);
+    }
+
+    /* ----- chat-style-container ----- */
+    .chat-style-container {
+      background: var(--chat-style-container-bg);
+      border-radius: 12px;
+      padding: 20px 16px;
+      margin: 20px 0;
+    }
+
+    /* ----- chat-style-bubble (共通) ----- */
+    .chat-style-bubble {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .chat-style-bubble:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ----- アバター ----- */
+    .chat-style-avatar {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+    }
+    .chat-style-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--chat-style-icon-bg);
+    }
+
+    /* ----- コンテンツ（話者名＋吹き出し） ----- */
+    .chat-style-content {
+      max-width: 70%;
+    }
+    .chat-style-speaker-name {
+      font-size: 0.75em;
+      color: var(--chat-style-speaker-color);
+      margin-bottom: 4px;
+    }
+
+    /* ----- 吹き出し本体 ----- */
+    .chat-style-message {
+      position: relative;
+      padding: 10px 14px;
+      border-radius: 12px;
+      line-height: 1.6;
+      word-break: break-word;
+    }
+    .chat-style-message p {
+      margin: 0;
+    }
+    .chat-style-message p + p {
+      margin-top: 8px;
+    }
+
+    /* ----- 左配置（相手側） ----- */
+    .chat-style-left {
+      flex-direction: row;
+    }
+    .chat-style-left .chat-style-avatar {
+      margin-right: 10px;
+    }
+    .chat-style-left .chat-style-speaker-name {
+      text-align: left;
+    }
+    .chat-style-left .chat-style-message {
+      background: var(--chat-style-left-bg);
+      color: var(--chat-style-left-color);
+    }
+    .chat-style-left .chat-style-message::before {
+      content: "";
+      position: absolute;
+      top: 12px;
+      left: -8px;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 6px 8px 6px 0;
+      border-color: transparent var(--chat-style-left-bg) transparent transparent;
+    }
+
+    /* ----- 右配置（自分側） ----- */
+    .chat-style-right {
+      flex-direction: row-reverse;
+    }
+    .chat-style-right .chat-style-avatar {
+      margin-left: 10px;
+    }
+    .chat-style-right .chat-style-content {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    .chat-style-right .chat-style-speaker-name {
+      text-align: right;
+    }
+    .chat-style-right .chat-style-message {
+      background: var(--chat-style-right-bg);
+      color: var(--chat-style-right-color);
+    }
+    .chat-style-right .chat-style-message::before {
+      content: "";
+      position: absolute;
+      top: 12px;
+      right: -8px;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 6px 0 6px 8px;
+      border-color: transparent transparent transparent var(--chat-style-right-bg);
+    }
+
+    /* ----- エラー表示 ----- */
+    .chat-style-error {
+      background: var(--chat-style-error-bg);
+      border: 1px solid var(--chat-style-error-border);
+      border-radius: 8px;
+      color: var(--chat-style-error-color);
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      font-size: 0.9em;
+    }
+
+    /* ----- レスポンシブ ----- */
+    @media (max-width: 600px) {
+      .chat-style-content {
+        max-width: 85%;
+      }
+      .chat-style-avatar {
+        width: 32px;
+        height: 32px;
+      }
+      .chat-style-icon {
+        width: 32px;
+        height: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <button class="theme-toggle" onclick="toggleTheme()">🌓 Light / Dark</button>
+
+  <h1>ドキュメントタイトル</h1>
+  <p>これは通常のMarkdownコンテンツです。Growiのページ内で普通に文章を書いている部分をイメージしています。</p>
+  <p>以下から会話形式のブロックが始まります（<code>::::chat-style</code>）。</p>
+
+  <!-- ===== 会話ブロック1 ===== -->
+  <div class="chat-style-container">
+
+    <div class="chat-style-bubble chat-style-left">
+      <div class="chat-style-avatar">
+        <img src="https://api.dicebear.com/9.x/bottts/svg?seed=claude" alt="claude-bot" class="chat-style-icon" />
+      </div>
+      <div class="chat-style-content">
+        <div class="chat-style-speaker-name">claude-bot</div>
+        <div class="chat-style-message">
+          <p>こんにちは！何かお手伝いできることはありますか？</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-style-bubble chat-style-right">
+      <div class="chat-style-avatar">
+        <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=me" alt="me" class="chat-style-icon" />
+      </div>
+      <div class="chat-style-content">
+        <div class="chat-style-speaker-name">me</div>
+        <div class="chat-style-message">
+          <p>Growiのプラグイン開発について教えてください。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-style-bubble chat-style-left">
+      <div class="chat-style-avatar">
+        <img src="https://api.dicebear.com/9.x/bottts/svg?seed=claude" alt="claude-bot" class="chat-style-icon" />
+      </div>
+      <div class="chat-style-content">
+        <div class="chat-style-speaker-name">claude-bot</div>
+        <div class="chat-style-message">
+          <p>もちろんです！Growiのプラグインは <strong>remarkプラグイン</strong> として開発します。</p>
+          <p>Markdownの構文木（AST）を変換して、カスタムHTMLを出力する仕組みです。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-style-bubble chat-style-right">
+      <div class="chat-style-avatar">
+        <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=me" alt="me" class="chat-style-icon" />
+      </div>
+      <div class="chat-style-content">
+        <div class="chat-style-speaker-name">me</div>
+        <div class="chat-style-message">
+          <p>なるほど、<code>:::記法</code>を使うんですね。ありがとうございます！</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <p>会話ブロックが終わり、通常のMarkdownに戻りました。</p>
+
+  <h2>別のセクション</h2>
+  <p>1ページ内に複数の会話ブロックを配置することもできます。</p>
+
+  <!-- ===== 会話ブロック2（別の話者） ===== -->
+  <div class="chat-style-container">
+
+    <div class="chat-style-bubble chat-style-left">
+      <div class="chat-style-avatar">
+        <img src="https://api.dicebear.com/9.x/bottts/svg?seed=admin" alt="admin" class="chat-style-icon" />
+      </div>
+      <div class="chat-style-content">
+        <div class="chat-style-speaker-name">admin</div>
+        <div class="chat-style-message">
+          <p>プラグインのインストールは管理画面から行えます。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-style-bubble chat-style-right">
+      <div class="chat-style-avatar">
+        <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=me" alt="me" class="chat-style-icon" />
+      </div>
+      <div class="chat-style-content">
+        <div class="chat-style-speaker-name">me</div>
+        <div class="chat-style-message">
+          <p>了解です！</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2>エラー表示のサンプル</h2>
+  <p>未定義の話者を使った場合のエラー表示です。</p>
+
+  <!-- ===== エラーサンプル ===== -->
+  <div class="chat-style-container">
+
+    <div class="chat-style-error">
+      ⚠ [chat-style error] 話者 "unknown-user" は /chat-style-icons に定義されていません
+    </div>
+
+    <div class="chat-style-bubble chat-style-left">
+      <div class="chat-style-avatar">
+        <img src="https://api.dicebear.com/9.x/bottts/svg?seed=claude" alt="claude-bot" class="chat-style-icon" />
+      </div>
+      <div class="chat-style-content">
+        <div class="chat-style-speaker-name">claude-bot</div>
+        <div class="chat-style-message">
+          <p>定義済みの話者はエラーの前後でも正常に表示されます。</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <hr>
+  <p style="color: var(--bs-secondary-color); font-size: 0.85em;">
+    このHTMLは growi-plugin-ssn-chatstyle-display のプレビュー用サンプルです。<br>
+    右上のボタンでLight/Darkモードを切り替えられます。<br>
+    CSS変数はBootstrap 5の <code>--bs-*</code> を参照し、プラグイン固有の色は <code>--chat-style-*</code> で定義しています。
+  </p>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-bs-theme');
+      html.setAttribute('data-bs-theme', current === 'dark' ? 'light' : 'dark');
+    }
+  </script>
+
+</body>
+</html>
