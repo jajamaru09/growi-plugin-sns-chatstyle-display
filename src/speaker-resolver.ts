@@ -88,29 +88,18 @@ export async function fetchSpeakerMap(): Promise<void> {
   fetchInProgress = true;
 
   try {
-    console.log('[chat-style] Fetching /_api/v3/page?path=/chat-style-icons ...');
     const res = await fetch('/_api/v3/page?path=/chat-style-icons');
-    if (!res.ok) {
-      console.warn('[chat-style] Failed to fetch /chat-style-icons:', res.status);
-      return;
-    }
+    if (!res.ok) return;
 
     const data = await res.json();
     const body: string | undefined = data?.page?.revision?.body;
-    if (!body) {
-      console.warn('[chat-style] /chat-style-icons page has no content');
-      return;
-    }
+    if (!body) return;
 
     cachedSpeakerMap = parseMarkdownTable(body);
     cacheTimestamp = Date.now();
-    console.log('[chat-style] Parsed speaker map:', cachedSpeakerMap.size, 'entries');
-    cachedSpeakerMap.forEach((def, key) => {
-      console.log('[chat-style]   ', key, '→', def.position, def.iconUrl);
-    });
   }
-  catch (e) {
-    console.warn('[chat-style] Error fetching speaker map:', e);
+  catch {
+    // fetch失敗時は既存キャッシュを維持
   }
   finally {
     fetchInProgress = false;
