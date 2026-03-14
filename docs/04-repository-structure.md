@@ -70,3 +70,9 @@ growi-plugin-ssn-chatstyle-display/
 - `package.json`: Growiプラグインの `growiPlugin` フィールドを含む
 - `CLAUDE.md`: 開発プロセスの定義（本リポジトリ固有）
 - `README.md`: 利用者向けのインストール手順・使い方
+
+## 変更履歴
+
+| ステアリング | 変更内容 |
+|---|---|
+| [#01-initial-implementation](.steering/20260315-01-initial-implementation/) | `src/types.d.ts` がファイル構成に含まれていない。`client-entry.tsx` は `src/` ではなくルート直下に配置された。 |

@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "description": "SNS-style chat display plugin for GROWI",
   "main": "client-entry.tsx",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
   "keywords": [
     "growi",
     "growi-plugin"
@@ -17,7 +22,9 @@
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "@vitejs/plugin-react": "^4.3.0",
+    "typescript": "^5.0.0",
+    "vite": "^6.0.0"
   },
   "license": "MIT"
 }

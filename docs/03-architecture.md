@@ -187,3 +187,9 @@ document.head.appendChild(style);
 | AST変換速度 | 1ページあたり100ms以内 | `node.data.hName` によるメタデータ付与のみ、DOMは触らない |
 | CSS読み込み | FOUC（スタイル未適用の一瞬表示）を防ぐ | `activate()` で即座にCSS注入 |
 | 大量バブル | 1ページに50個以上のバブルがあっても描画に支障がない | 軽量なAST操作、CSS変数による効率的なスタイリング |
+
+## 変更履歴
+
+| ステアリング | 変更内容 |
+|---|---|
+| [#01-initial-implementation](.steering/20260315-01-initial-implementation/) | 実装時に `src/types.d.ts` を追加（CSS raw import型宣言、unified Plugin型宣言）。設計書にないファイルが追加された。 |
