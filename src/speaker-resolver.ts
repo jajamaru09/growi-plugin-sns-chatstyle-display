@@ -61,11 +61,15 @@ function parseMarkdownTable(markdown: string): SpeakerMap {
     if (!VALID_NAME_PATTERN.test(expression)) continue;
     if (positionStr !== 'left' && positionStr !== 'right') continue;
 
-    // アイコンURLの抽出
-    const iconMatch = iconRaw.match(MARKDOWN_IMAGE_PATTERN);
-    if (!iconMatch) continue;
-    const iconUrl = iconMatch[1];
-    if (!VALID_URL_PATTERN.test(iconUrl)) continue;
+    // アイコンURLの抽出（空の場合はアイコンなしとして許容）
+    let iconUrl = '';
+    const iconTrimmed = iconRaw.trim();
+    if (iconTrimmed !== '') {
+      const iconMatch = iconTrimmed.match(MARKDOWN_IMAGE_PATTERN);
+      if (!iconMatch) continue;
+      iconUrl = iconMatch[1];
+      if (!VALID_URL_PATTERN.test(iconUrl)) continue;
+    }
 
     const key = `${speaker}_${expression}`;
     map.set(key, {
