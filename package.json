@@ -1,0 +1,23 @@
+{
+  "name": "growi-plugin-ssn-chatstyle-display",
+  "version": "1.0.0",
+  "description": "SNS-style chat display plugin for GROWI",
+  "main": "client-entry.tsx",
+  "keywords": [
+    "growi",
+    "growi-plugin"
+  ],
+  "growiPlugin": {
+    "schemaVersion": 4,
+    "types": [
+      "script"
+    ]
+  },
+  "dependencies": {
+    "unist-util-visit": "^5.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "license": "MIT"
+}
