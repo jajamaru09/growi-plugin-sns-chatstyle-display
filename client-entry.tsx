@@ -2,34 +2,26 @@ import { plugin } from './src/plugin';
 import { fetchSpeakerMap, getSpeakerMap } from './src/speaker-resolver';
 import CSS_CONTENT from './src/styles/chat-style.css?raw';
 
-interface GrowiMarkdownRenderer {
-  optionsGenerators: {
-    generateViewOptions: (...args: unknown[]) => { remarkPlugins: unknown[] };
-    customGenerateViewOptions?: (...args: unknown[]) => { remarkPlugins: unknown[] };
-    generatePreviewOptions: (...args: unknown[]) => { remarkPlugins: unknown[] };
-    customGeneratePreviewOptions?: (...args: unknown[]) => { remarkPlugins: unknown[] };
+declare const growiFacade: {
+  markdownRenderer?: {
+    optionsGenerators: {
+      generateViewOptions: (...args: unknown[]) => { remarkPlugins: unknown[] };
+      customGenerateViewOptions?: (...args: unknown[]) => { remarkPlugins: unknown[] };
+      generatePreviewOptions: (...args: unknown[]) => { remarkPlugins: unknown[] };
+      customGeneratePreviewOptions?: (...args: unknown[]) => { remarkPlugins: unknown[] };
+    };
   };
-}
-
-interface GrowiGlobalWindow extends Window {
-  growiFacade?: {
-    markdownRenderer?: GrowiMarkdownRenderer;
-  };
-}
+} | null;
 
 const activate = (): void => {
-  console.log('[chat-style] activate() called');
+  console.log('[chat-style] activate() called by GROWI');
 
-  const win = window as unknown as GrowiGlobalWindow;
-  const facade = win.growiFacade;
-
-  console.log('[chat-style] growiFacade:', facade);
-  console.log('[chat-style] growiFacade?.markdownRenderer:', facade?.markdownRenderer);
-
-  if (facade == null || facade.markdownRenderer == null) {
+  if (growiFacade == null || growiFacade.markdownRenderer == null) {
     console.warn('[chat-style] growiFacade or markdownRenderer is null, aborting');
     return;
   }
+
+  console.log('[chat-style] growiFacade available');
 
   // CSS注入
   const style = document.createElement('style');
@@ -44,7 +36,7 @@ const activate = (): void => {
   });
 
   // remarkプラグイン登録
-  const { optionsGenerators } = facade.markdownRenderer;
+  const { optionsGenerators } = growiFacade.markdownRenderer;
 
   // 閲覧用（既存設定を保持して上書き）
   const originalView = optionsGenerators.customGenerateViewOptions;
@@ -71,5 +63,17 @@ const activate = (): void => {
   console.log('[chat-style] Plugin activation complete');
 };
 
-console.log('[chat-style] Script loaded');
-activate();
+const deactivate = (): void => {
+  // クリーンアップ処理（必要に応じて実装）
+};
+
+// Growiのプラグインシステムに登録（Growiが適切なタイミングでactivateを呼び出す）
+if ((window as any).pluginActivators == null) {
+  (window as any).pluginActivators = {};
+}
+(window as any).pluginActivators['growi-plugin-ssn-chatstyle-display'] = {
+  activate,
+  deactivate,
+};
+
+console.log('[chat-style] Plugin registered to window.pluginActivators');
