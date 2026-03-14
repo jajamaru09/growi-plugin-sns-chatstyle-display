@@ -2,23 +2,31 @@ import { plugin } from './src/plugin';
 import { fetchSpeakerMap, getSpeakerMap } from './src/speaker-resolver';
 import CSS_CONTENT from './src/styles/chat-style.css?raw';
 
-declare const growiFacade: {
-  markdownRenderer?: {
-    optionsGenerators: {
-      generateViewOptions: (...args: unknown[]) => { remarkPlugins: unknown[] };
-      customGenerateViewOptions?: (...args: unknown[]) => { remarkPlugins: unknown[] };
-      generatePreviewOptions: (...args: unknown[]) => { remarkPlugins: unknown[] };
-      customGeneratePreviewOptions?: (...args: unknown[]) => { remarkPlugins: unknown[] };
-    };
+interface GrowiMarkdownRenderer {
+  optionsGenerators: {
+    generateViewOptions: (...args: unknown[]) => { remarkPlugins: unknown[] };
+    customGenerateViewOptions?: (...args: unknown[]) => { remarkPlugins: unknown[] };
+    generatePreviewOptions: (...args: unknown[]) => { remarkPlugins: unknown[] };
+    customGeneratePreviewOptions?: (...args: unknown[]) => { remarkPlugins: unknown[] };
   };
-} | null;
+}
+
+interface GrowiGlobalWindow extends Window {
+  growiFacade?: {
+    markdownRenderer?: GrowiMarkdownRenderer;
+  };
+}
 
 const activate = (): void => {
   console.log('[chat-style] activate() called');
-  console.log('[chat-style] growiFacade:', growiFacade);
-  console.log('[chat-style] growiFacade?.markdownRenderer:', growiFacade?.markdownRenderer);
 
-  if (growiFacade == null || growiFacade.markdownRenderer == null) {
+  const win = window as unknown as GrowiGlobalWindow;
+  const facade = win.growiFacade;
+
+  console.log('[chat-style] growiFacade:', facade);
+  console.log('[chat-style] growiFacade?.markdownRenderer:', facade?.markdownRenderer);
+
+  if (facade == null || facade.markdownRenderer == null) {
     console.warn('[chat-style] growiFacade or markdownRenderer is null, aborting');
     return;
   }
@@ -36,7 +44,7 @@ const activate = (): void => {
   });
 
   // remarkプラグイン登録
-  const { optionsGenerators } = growiFacade.markdownRenderer;
+  const { optionsGenerators } = facade.markdownRenderer;
 
   // 閲覧用（既存設定を保持して上書き）
   const originalView = optionsGenerators.customGenerateViewOptions;
