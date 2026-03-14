@@ -26,6 +26,13 @@ const activate = (): void => {
   // 話者定義の非同期取得（ページ読み込みをブロックしない）
   fetchSpeakerMap();
 
+  // リロードボタン用グローバル関数を登録
+  (window as any).__chatStyleReload = () => {
+    fetchSpeakerMap().then(() => {
+      window.location.reload();
+    });
+  };
+
   // remarkプラグイン登録
   const { optionsGenerators } = growiFacade.markdownRenderer;
 
