@@ -48,39 +48,32 @@ export function transformSpeakerBubble(node: any, def: SpeakerDefinition): void 
     children: originalChildren,
   };
 
+  const hasAvatar = def.iconUrl !== '';
+  const avatarNode = hasAvatar
+    ? { type: 'html' as const, value: createAvatarHtml(def) }
+    : null;
+
+  const contentNode = {
+    type: 'containerDirective' as const,
+    data: {
+      hName: 'div',
+      hProperties: { className: ['chat-style-content'] },
+    },
+    children: [
+      { type: 'html', value: createSpeakerNameHtml(def) },
+      messageWrapper,
+    ],
+  };
+
   if (isRight) {
-    // 右配置: 話者名 → メッセージ → アバター
-    node.children = [
-      {
-        type: 'containerDirective' as const,
-        data: {
-          hName: 'div',
-          hProperties: { className: ['chat-style-content'] },
-        },
-        children: [
-          { type: 'html', value: createSpeakerNameHtml(def) },
-          messageWrapper,
-        ],
-      },
-      { type: 'html', value: createAvatarHtml(def) },
-    ];
+    node.children = avatarNode
+      ? [contentNode, avatarNode]
+      : [contentNode];
   }
   else {
-    // 左配置: アバター → 話者名 → メッセージ
-    node.children = [
-      { type: 'html', value: createAvatarHtml(def) },
-      {
-        type: 'containerDirective' as const,
-        data: {
-          hName: 'div',
-          hProperties: { className: ['chat-style-content'] },
-        },
-        children: [
-          { type: 'html', value: createSpeakerNameHtml(def) },
-          messageWrapper,
-        ],
-      },
-    ];
+    node.children = avatarNode
+      ? [avatarNode, contentNode]
+      : [contentNode];
   }
 }
 
