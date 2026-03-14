@@ -1,0 +1,8 @@
+{
+  "client-entry.tsx": {
+    "file": "assets/client-entry-w51-4BTR.js",
+    "name": "client-entry",
+    "src": "client-entry.tsx",
+    "isEntry": true
+  }
+}
