@@ -1,0 +1,162 @@
+/* ==========================================================
+   growi-plugin-ssn-chatstyle-display
+   Bootstrap CSS変数を利用してlight/darkテーマに自動対応
+   ========================================================== */
+
+/* ----- プラグイン固有CSS変数 ----- */
+:root, [data-bs-theme="light"] {
+  --chat-style-container-bg: var(--bs-tertiary-bg);
+  --chat-style-left-bg: var(--bs-secondary-bg);
+  --chat-style-left-color: var(--bs-body-color);
+  --chat-style-right-bg: #8de88b;
+  --chat-style-right-color: #1a3a1a;
+  --chat-style-speaker-color: var(--bs-secondary-color);
+  --chat-style-icon-bg: var(--bs-secondary-bg);
+  --chat-style-error-bg: var(--bs-danger-bg-subtle);
+  --chat-style-error-border: var(--bs-danger-border-subtle);
+  --chat-style-error-color: var(--bs-danger-text-emphasis);
+}
+[data-bs-theme="dark"] {
+  --chat-style-right-bg: #2d6a2e;
+  --chat-style-right-color: #d4f5d4;
+}
+
+/* ----- chat-style-container ----- */
+.chat-style-container {
+  background: var(--chat-style-container-bg);
+  border-radius: 12px;
+  padding: 20px 16px;
+  margin: 20px 0;
+}
+
+/* ----- chat-style-bubble (共通) ----- */
+.chat-style-bubble {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+.chat-style-bubble:last-child {
+  margin-bottom: 0;
+}
+
+/* ----- アバター ----- */
+.chat-style-avatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+}
+.chat-style-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--chat-style-icon-bg);
+}
+
+/* ----- コンテンツ（話者名＋吹き出し） ----- */
+.chat-style-content {
+  max-width: 70%;
+}
+.chat-style-speaker-name {
+  font-size: 0.75em;
+  color: var(--chat-style-speaker-color);
+  margin-bottom: 4px;
+}
+
+/* ----- 吹き出し本体 ----- */
+.chat-style-message {
+  position: relative;
+  padding: 10px 14px;
+  border-radius: 12px;
+  line-height: 1.6;
+  word-break: break-word;
+}
+.chat-style-message p {
+  margin: 0;
+}
+.chat-style-message p + p {
+  margin-top: 8px;
+}
+
+/* ----- 左配置（相手側） ----- */
+.chat-style-left {
+  flex-direction: row;
+}
+.chat-style-left .chat-style-avatar {
+  margin-right: 10px;
+}
+.chat-style-left .chat-style-speaker-name {
+  text-align: left;
+}
+.chat-style-left .chat-style-message {
+  background: var(--chat-style-left-bg);
+  color: var(--chat-style-left-color);
+}
+.chat-style-left .chat-style-message::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: -8px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 8px 6px 0;
+  border-color: transparent var(--chat-style-left-bg) transparent transparent;
+}
+
+/* ----- 右配置（自分側） ----- */
+.chat-style-right {
+  flex-direction: row-reverse;
+}
+.chat-style-right .chat-style-avatar {
+  margin-left: 10px;
+}
+.chat-style-right .chat-style-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.chat-style-right .chat-style-speaker-name {
+  text-align: right;
+}
+.chat-style-right .chat-style-message {
+  background: var(--chat-style-right-bg);
+  color: var(--chat-style-right-color);
+}
+.chat-style-right .chat-style-message::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  right: -8px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 0 6px 8px;
+  border-color: transparent transparent transparent var(--chat-style-right-bg);
+}
+
+/* ----- エラー表示 ----- */
+.chat-style-error {
+  background: var(--chat-style-error-bg);
+  border: 1px solid var(--chat-style-error-border);
+  border-radius: 8px;
+  color: var(--chat-style-error-color);
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-size: 0.9em;
+}
+
+/* ----- レスポンシブ ----- */
+@media (max-width: 600px) {
+  .chat-style-content {
+    max-width: 85%;
+  }
+  .chat-style-avatar {
+    width: 32px;
+    height: 32px;
+  }
+  .chat-style-icon {
+    width: 32px;
+    height: 32px;
+  }
+}
