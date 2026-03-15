@@ -152,7 +152,7 @@ const deactivate = (): void => {};
 if ((window as any).pluginActivators == null) {
   (window as any).pluginActivators = {};
 }
-(window as any).pluginActivators['growi-plugin-ssn-chatstyle-display'] = {
+(window as any).pluginActivators['growi-plugin-sns-chatstyle-display'] = {
   activate,
   deactivate,
 };

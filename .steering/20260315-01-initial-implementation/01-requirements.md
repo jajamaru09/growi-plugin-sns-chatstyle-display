@@ -2,7 +2,7 @@
 
 ## 変更・追加する機能の説明
 
-Growiプラグイン「growi-plugin-ssn-chatstyle-display」の初回実装を行う。
+Growiプラグイン「growi-plugin-sns-chatstyle-display」の初回実装を行う。
 `docs/` で定義された設計に基づき、以下の機能を動作可能な状態まで実装する。
 
 ### 実装スコープ

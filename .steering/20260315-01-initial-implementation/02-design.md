@@ -24,7 +24,7 @@
 
 ```json
 {
-  "name": "growi-plugin-ssn-chatstyle-display",
+  "name": "growi-plugin-sns-chatstyle-display",
   "version": "1.0.0",
   "description": "SNS-style chat display plugin for GROWI",
   "main": "client-entry.tsx",
