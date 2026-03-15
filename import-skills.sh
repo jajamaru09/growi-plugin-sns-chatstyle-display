@@ -19,7 +19,7 @@ if ! git remote get-url "$REMOTE_NAME" >/dev/null 2>&1; then
 fi
 
 # Initial add or update
-if [ -d "$PREFIX" ] && git log --oneline -1 --grep="$REMOTE_NAME/" -- "$PREFIX" >/dev/null 2>&1 && [ -n "$(git log --oneline -1 --grep="$REMOTE_NAME/" -- "$PREFIX")" ]; then
+if [ -d "$PREFIX" ] && git ls-files --error-unmatch "$PREFIX" >/dev/null 2>&1; then
   echo "Updating subtree: $PREFIX"
   git subtree pull --prefix="$PREFIX" "$REMOTE_NAME" "$BRANCH" --squash -m "Update $PREFIX from $REMOTE_NAME"
 else
