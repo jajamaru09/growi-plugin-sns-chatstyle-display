@@ -3,7 +3,7 @@
 ## 1. フォルダ・ファイル構成
 
 ```
-growi-plugin-ssn-chatstyle-display/
+growi-plugin-sns-chatstyle-display/
 ├── .gitea/
 │   └── workflows/
 │       └── claude.yaml           # CI/CD ワークフロー
